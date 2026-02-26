@@ -4,12 +4,16 @@ public class PalindromeCheckerApp {
 
         String word = "madam";
         String reversedWord = "";
+        boolean isPalindrome = true;
 
-        for (int i = word.length() - 1; i >= 0; i--) {
-            reversedWord = reversedWord + word.charAt(i);
+        for (int i = 0; i < word.length(); i++) {
+            if (word.charAt(i) != word.charAt(word.length() - 1 - i)) {
+                isPalindrome=false;
+                break;
+            }
         }
 
-        if (word.equals(reversedWord)) {
+        if (isPalindrome) {
             System.out.println("The word \"" + word + "\" is a palindrome.");
         } else {
             System.out.println("The word \"" + word + "\" is not a palindrome.");
