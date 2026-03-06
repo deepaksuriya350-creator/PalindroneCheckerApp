@@ -3,106 +3,67 @@ import java.util.Stack;
 import java.util.Deque;
 import java.util.ArrayDeque;
 
-// Strategy interface for palindrome algorithms
-interface PalindromeStrategy {
-    boolean check(String text);
-}
-
-// Stack-based palindrome checking strategy
-class StackStrategy implements PalindromeStrategy {
-    @Override
-    public boolean check(String text) {
-        String normalized = text.replaceAll("\\s+", "").toLowerCase();
-        Stack<Character> stack = new Stack<>();
-
-        // Push all characters
-        for (char ch : normalized.toCharArray()) {
-            stack.push(ch);
-        }
-
-        // Pop and compare
-        for (char ch : normalized.toCharArray()) {
-            if (ch != stack.pop()) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
-
-// Deque-based palindrome checking strategy
-class DequeStrategy implements PalindromeStrategy {
-    @Override
-    public boolean check(String text) {
-        String normalized = text.replaceAll("\\s+", "").toLowerCase();
-        Deque<Character> deque = new ArrayDeque<>();
-
-        // Add characters to deque
-        for (char ch : normalized.toCharArray()) {
-            deque.addLast(ch);
-        }
-
-        // Compare front and rear
-        while (deque.size() > 1) {
-            if (deque.removeFirst() != deque.removeLast()) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
-
-// Context class that uses a strategy
-class PalindromeCheckerContext {
-    private PalindromeStrategy strategy;
-
-    public void setStrategy(PalindromeStrategy strategy) {
-        this.strategy = strategy;
-    }
-
-    public boolean checkPalindrome(String text) {
-        if (strategy == null) {
-            throw new IllegalStateException("No strategy selected!");
-        }
-        return strategy.check(text);
-    }
-}
-
-// Main application class
 public class PalindromeCheckerApp {
 
-    public static void main(String[] args) {
+    // Approach 1: Two-pointer on char array
+    public static boolean charArrayPalindrome(String text) {
+        char[] chars = text.toCharArray();
+        int start = 0, end = chars.length - 1;
+        while (start < end) {
+            if (chars[start] != chars[end]) return false;
+            start++;
+            end--;
+        }
+        return true;
+    }
 
+    // Approach 2: Stack-based
+    public static boolean stackPalindrome(String text) {
+        String normalized = text.replaceAll("\\s+", "").toLowerCase();
+        Stack<Character> stack = new Stack<>();
+        for (char ch : normalized.toCharArray()) stack.push(ch);
+        for (char ch : normalized.toCharArray()) if (ch != stack.pop()) return false;
+        return true;
+    }
+
+    // Approach 3: Deque-based
+    public static boolean dequePalindrome(String text) {
+        String normalized = text.replaceAll("\\s+", "").toLowerCase();
+        Deque<Character> deque = new ArrayDeque<>();
+        for (char ch : normalized.toCharArray()) deque.addLast(ch);
+        while (deque.size() > 1) if (deque.removeFirst() != deque.removeLast()) return false;
+        return true;
+    }
+
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter a string to check if it is a palindrome:");
+        System.out.println("Enter a string to test palindrome algorithms:");
         String input = scanner.nextLine();
 
-        System.out.println("Select strategy: 1 = Stack, 2 = Deque");
-        int choice = scanner.nextInt();
+        // Char array approach
+        long startTime = System.nanoTime();
+        boolean result1 = charArrayPalindrome(input);
+        long endTime = System.nanoTime();
+        long duration1 = endTime - startTime;
 
-        // Create context and inject strategy
-        PalindromeCheckerContext context = new PalindromeCheckerContext();
+        // Stack approach
+        startTime = System.nanoTime();
+        boolean result2 = stackPalindrome(input);
+        endTime = System.nanoTime();
+        long duration2 = endTime - startTime;
 
-        switch (choice) {
-            case 1:
-                context.setStrategy(new StackStrategy());
-                break;
-            case 2:
-                context.setStrategy(new DequeStrategy());
-                break;
-            default:
-                System.out.println("Invalid choice. Defaulting to StackStrategy.");
-                context.setStrategy(new StackStrategy());
-        }
+        // Deque approach
+        startTime = System.nanoTime();
+        boolean result3 = dequePalindrome(input);
+        endTime = System.nanoTime();
+        long duration3 = endTime - startTime;
 
-        boolean result = context.checkPalindrome(input);
-
-        if (result) {
-            System.out.println("The given string is a Palindrome.");
-        } else {
-            System.out.println("The given string is NOT a Palindrome.");
-        }
+        // Display results
+        System.out.println("\nPalindrome Check Results:");
+        System.out.printf("Char Array Approach: %b, Time: %d ns%n", result1, duration1);
+        System.out.printf("Stack Approach:      %b, Time: %d ns%n", result2, duration2);
+        System.out.printf("Deque Approach:      %b, Time: %d ns%n", result3, duration3);
 
         scanner.close();
     }
